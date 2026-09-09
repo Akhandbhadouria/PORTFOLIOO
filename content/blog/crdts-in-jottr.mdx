@@ -1,0 +1,133 @@
+---
+title: How CRDTs Power Real-Time Editing in Jottr
+date: 2026-07-08
+summary: A practical tour of the conflict-free replicated data types behind Jottr's collaborative editor — why locks lose, how convergence works, and what it cost in latency.
+tags: [CRDT, Realtime, Yjs, Architecture]
+cover: /blog/crdt-cover.svg
+author: Vibhav Yadav
+---
+
+When two people type into the same document at the same moment, something has to
+decide what the final text looks like. The naive answer — a lock, or a
+last-write-wins server — falls apart the instant your users go offline, edit on a
+plane, and reconnect. Jottr takes a different route: it never asks permission to
+edit. Every replica applies changes locally and *guarantees* they'll converge to
+the same state later. That guarantee comes from **CRDTs** — conflict-free
+replicated data types.[^1]
+
+## The problem with a central referee
+
+A traditional collaborative editor routes every keystroke through a server that
+serializes operations into a single order — operational transformation, or OT.
+It works, but it couples correctness to connectivity: the server is the referee,
+and if a client can't reach it, the client can't safely edit.
+
+<Callout type="warn" title="Where OT hurts">
+Operational transformation needs a central authority to transform concurrent
+operations against each other. That authority is a single point of failure and a
+latency floor — every edit pays a round trip before it's "real".
+</Callout>
+
+CRDTs invert this. Instead of transforming operations against a shared timeline,
+each operation carries enough identity to be *commutative*: apply them in any
+order, on any replica, and you land in the same place.
+
+## Convergence, concretely
+
+Consider two replicas that start from the same empty document and edit while
+disconnected. Replica A types `Hi there`; Replica B types `Hi all`. There is no
+server to arbitrate. When they finally sync, the merge is deterministic — both
+sides compute the identical result from the same set of operations.
+
+<Figure
+  src="/blog/crdt-merge.svg"
+  alt="Two replicas each applying local inserts, then converging to one deterministic string"
+  caption="Both replicas apply local operations offline, then converge to the same state on sync — no central referee required."
+/>
+
+The trick is that every inserted character gets a unique, totally-ordered
+identifier. Concurrent inserts at the "same" position are broken by comparing
+those identifiers, so every replica resolves the tie the same way.
+
+## What this looks like in code
+
+Jottr uses [Yjs](https://github.com/yjs/yjs) for the CRDT layer. A shared
+document is a `Y.Doc`; text lives in a `Y.Text`; and transport is anything that
+can move binary updates around — we use Supabase Realtime.
+
+```js title="collab.js" {6-9}
+import * as Y from 'yjs'
+
+const doc = new Y.Doc()
+const text = doc.getText('body')
+
+// Every local edit produces a compact binary update…
+doc.on('update', (update, origin) => {
+  if (origin !== 'remote') channel.broadcast(update)
+})
+
+// …and every remote update is applied optimistically.
+channel.on('update', (update) => {
+  Y.applyUpdate(doc, update, 'remote')
+})
+
+text.insert(0, 'Hi there') // local, instant, no round trip
+```
+
+Notice what's *not* here: no acknowledgement step, no server-assigned sequence
+number, no conflict handler. `Y.applyUpdate` is commutative and idempotent —
+replaying the same update twice is a no-op, and order doesn't matter.
+
+<Callout type="tip" title="Idempotence is a feature">
+Because applying an update twice changes nothing, you can be sloppy about
+delivery. At-least-once transport is fine. That single property removes an entire
+category of sync bugs.
+</Callout>
+
+## The cost: measuring latency
+
+CRDTs aren't free — metadata per character adds up, and early builds of Jottr
+felt sluggish on large documents. After moving to Yjs's optimized structural
+encoding and batching updates per animation frame, perceived edit-to-render
+latency dropped sharply:
+
+<Chart
+  type="line"
+  xKey="week"
+  series={[
+    { key: 'before', name: 'p95 before (ms)', color: '#94a3b8' },
+    { key: 'after', name: 'p95 after (ms)', color: '#f7790f' }
+  ]}
+  data={[
+    { week: 'W1', before: 240, after: 240 },
+    { week: 'W2', before: 235, after: 150 },
+    { week: 'W3', before: 250, after: 96 },
+    { week: 'W4', before: 242, after: 70 },
+    { week: 'W5', before: 248, after: 58 }
+  ]}
+  caption="p95 edit-to-render latency on a 40-page document, before and after the encoding + batching rewrite."
+/>
+
+The absolute numbers matter less than the shape: batching collapsed the tail. A
+few slow updates per second were dragging p95 far above the median, and coalescing
+them per frame fixed the perceived stutter without changing correctness.
+
+## When *not* to reach for a CRDT
+
+CRDTs shine for free-form concurrent editing. They're overkill for data with a
+natural authority — a bank balance, an inventory count, anything where you
+genuinely want a single source of truth to reject conflicting writes. Reach for
+them when *availability* and *offline-first* matter more than a central veto.[^2]
+
+| Property            | OT (central)      | CRDT (Jottr)        |
+| ------------------- | ----------------- | ------------------- |
+| Offline editing     | Hard              | Native              |
+| Server role         | Referee           | Relay               |
+| Merge determinism   | Server-decided    | Math-guaranteed     |
+| Metadata overhead   | Low               | Higher (per-op)     |
+
+For a knowledge workspace where people draft on trains and reconcile later,
+that trade lands firmly on the CRDT side.
+
+[^1]: Shapiro, M., Preguiça, N., Baquero, C., & Zawirski, M. (2011). *Conflict-free Replicated Data Types*. INRIA Research Report 7687.
+[^2]: Kleppmann, M., & Beresford, A. R. (2017). *A Conflict-Free Replicated JSON Datatype*. IEEE Transactions on Parallel and Distributed Systems.

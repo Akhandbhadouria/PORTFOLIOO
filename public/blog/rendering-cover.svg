@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 600" width="1200" height="600" role="img" aria-label="Rendering strategies">
+  <defs>
+    <linearGradient id="bg2" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#eef1f7"/>
+      <stop offset="1" stop-color="#e6ecf4"/>
+    </linearGradient>
+    <radialGradient id="b2a" cx="82%" cy="18%" r="55%">
+      <stop offset="0" stop-color="#4ECDC4" stop-opacity="0.28"/>
+      <stop offset="1" stop-color="#4ECDC4" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="b2b" cx="14%" cy="82%" r="55%">
+      <stop offset="0" stop-color="#f7790f" stop-opacity="0.2"/>
+      <stop offset="1" stop-color="#f7790f" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1200" height="600" fill="url(#bg2)"/>
+  <rect width="1200" height="600" fill="url(#b2a)"/>
+  <rect width="1200" height="600" fill="url(#b2b)"/>
+  <g font-family="'IBM Plex Mono',monospace" font-size="20" fill="#0f172a" opacity="0.75" text-anchor="middle">
+    <rect x="120" y="360" width="150" height="80" rx="12" fill="#fff" stroke="#e2e6ee"/><text x="195" y="406">CSR</text>
+    <rect x="330" y="330" width="150" height="110" rx="12" fill="#fff" stroke="#e2e6ee"/><text x="405" y="392">SSR</text>
+    <rect x="540" y="290" width="150" height="150" rx="12" fill="#fff" stroke="#e2e6ee"/><text x="615" y="372">SSG</text>
+    <rect x="750" y="320" width="150" height="120" rx="12" fill="#fff" stroke="#e2e6ee"/><text x="825" y="386">ISR</text>
+    <rect x="960" y="350" width="150" height="90" rx="12" fill="#fff" stroke="#e2e6ee"/><text x="1035" y="400">Edge</text>
+  </g>
+  <text x="80" y="110" font-family="'Space Grotesk',sans-serif" font-size="26" fill="#0f9d8f" font-weight="600" letter-spacing="2">WEB PERFORMANCE</text>
+  <text x="78" y="180" font-family="'Space Grotesk',sans-serif" font-size="52" fill="#0f172a" font-weight="700">Where should you render?</text>
+</svg>

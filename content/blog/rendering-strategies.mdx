@@ -1,0 +1,108 @@
+---
+title: Where Should You Render? A Field Guide to Web Rendering Strategies
+date: 2026-06-22
+summary: CSR, SSR, SSG, ISR, and the edge — what each one actually optimizes for, the metrics that separate them, and a decision rule you can apply per route.
+tags: [Performance, Next.js, Rendering, SEO]
+cover: /blog/rendering-cover.svg
+author: Vibhav Yadav
+---
+
+"Should this page be server-rendered?" is the wrong question, because it assumes
+one answer for a whole app. The right unit is the **route**. Each route has its
+own data freshness needs, its own SEO stakes, and its own tolerance for a blank
+first paint — and modern frameworks let you pick a strategy per route. This is a
+map of the options and when each wins.
+
+## The five strategies
+
+- **CSR** (client-side rendering): ship an empty shell, fetch and render in the browser.
+- **SSR** (server-side rendering): render HTML per request on the server.
+- **SSG** (static site generation): render HTML once at build time.
+- **ISR** (incremental static regeneration): SSG, but pages re-generate in the background after a TTL.
+- **Edge**: SSR/ISR executed close to the user at a CDN node.
+
+## The metric that decides it
+
+Most of the debate collapses into one number: **time to first meaningful paint**,
+and how it trades against **data freshness**. A useful mental model is that total
+perceived latency is roughly
+
+$$
+T_{\text{paint}} = T_{\text{network}} + T_{\text{server}} + T_{\text{hydrate}}
+$$
+
+CSR pushes $T_{\text{server}} \to 0$ but pays a large $T_{\text{hydrate}}$ and a
+blank screen while data loads. SSG pushes both $T_{\text{server}}$ and
+$T_{\text{network}}$ toward their floor because the HTML is already sitting on a
+CDN — at the cost of freshness. The whole art is choosing which term you're
+willing to inflate.
+
+<Chart
+  type="bar"
+  xKey="strategy"
+  series={[
+    { key: 'ttfb', name: 'TTFB (ms)', color: '#6C8EFF' },
+    { key: 'freshness', name: 'Staleness risk (0-100)', color: '#f7790f' }
+  ]}
+  data={[
+    { strategy: 'CSR', ttfb: 40, freshness: 5 },
+    { strategy: 'SSR', ttfb: 180, freshness: 0 },
+    { strategy: 'SSG', ttfb: 30, freshness: 70 },
+    { strategy: 'ISR', ttfb: 35, freshness: 25 },
+    { strategy: 'Edge', ttfb: 60, freshness: 5 }
+  ]}
+  caption="Illustrative trade-off: SSG wins on time-to-first-byte but risks serving stale content; SSR is always fresh but pays a server cost per request."
+/>
+
+<Callout type="info" title="TTFB isn't everything">
+A fast TTFB with a heavy hydration step can still feel slow. Measure Interaction
+to Next Paint (INP), not just when bytes arrive. A static page that ships 300&nbsp;KB
+of JS can lose to an SSR page that ships 30.
+</Callout>
+
+## Picking per route
+
+Here's the rule I actually use when wiring up a Next.js app:
+
+```jsx title="app/blog/[slug]/page.jsx"
+// Static by default — the content changes only when I redeploy.
+export const dynamic = 'force-static'
+
+export function generateStaticParams() {
+  return getAllSlugs().map((slug) => ({ slug }))
+}
+
+// A dashboard route, by contrast, opts into per-request rendering:
+//   export const dynamic = 'force-dynamic'
+```
+
+The heuristic in one table:
+
+| Route type            | Freshness need | Best fit     |
+| --------------------- | -------------- | ------------ |
+| Marketing / docs      | Low            | SSG          |
+| Blog / articles       | Low–medium     | SSG or ISR   |
+| Product listings      | Medium         | ISR          |
+| Personalized dashboard| Per-request    | SSR / Edge   |
+| Highly interactive app| Client state   | CSR shell    |
+
+## A concrete example
+
+This very blog is **SSG**. Every post is an MDX file compiled at build time into
+static HTML and dropped onto a CDN — so `$T_{\text{server}} = 0$` at request time.
+The trade-off (content only updates on redeploy) is exactly right for writing:
+articles don't change between deploys, and I'd rather pay the cost once at build
+than on every read.[^1]
+
+If these were product pages with hourly price changes, I'd switch the same route
+to ISR with a short revalidation window and get 90% of the speed with a fraction
+of the staleness.[^2]
+
+## The takeaway
+
+Don't pick a rendering strategy for your app. Pick one per route, driven by how
+fresh the data must be and how much your users pay for a blank first paint.
+Frameworks made this a per-route decision on purpose — use that.
+
+[^1]: Osmani, A. (2019). *Rendering on the Web*. web.dev — a still-excellent taxonomy of these trade-offs.
+[^2]: Next.js documentation, *Incremental Static Regeneration*, nextjs.org/docs.

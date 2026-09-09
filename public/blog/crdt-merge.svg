@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 420" width="1000" height="420" role="img" aria-label="Two replicas converging">
+  <rect width="1000" height="420" fill="#f8f9fb"/>
+  <g font-family="'IBM Plex Mono',monospace" font-size="15" fill="#0f172a">
+    <!-- Replica A -->
+    <rect x="60" y="60" width="330" height="120" rx="14" fill="#fff" stroke="#e2e6ee"/>
+    <text x="80" y="90" fill="#6C8EFF" font-weight="600">Replica A</text>
+    <text x="80" y="122" opacity="0.8">insert "Hi" @0</text>
+    <text x="80" y="150" opacity="0.8">insert " there" @2</text>
+    <!-- Replica B -->
+    <rect x="610" y="60" width="330" height="120" rx="14" fill="#fff" stroke="#e2e6ee"/>
+    <text x="630" y="90" fill="#f7790f" font-weight="600">Replica B</text>
+    <text x="630" y="122" opacity="0.8">insert "Hi" @0</text>
+    <text x="630" y="150" opacity="0.8">insert " all" @2</text>
+    <!-- arrows to merge -->
+    <path d="M225 180 L470 280" fill="none" stroke="#6C8EFF" stroke-width="2" marker-end="url(#a)"/>
+    <path d="M775 180 L530 280" fill="none" stroke="#f7790f" stroke-width="2" marker-end="url(#a)"/>
+    <!-- merged state -->
+    <rect x="320" y="290" width="360" height="90" rx="14" fill="#fff" stroke="#c7f0ea"/>
+    <text x="500" y="322" text-anchor="middle" fill="#0f9d8f" font-weight="600">Converged (deterministic)</text>
+    <text x="500" y="352" text-anchor="middle" opacity="0.85">"Hi there all"</text>
+  </g>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#94a3b8"/>
+    </marker>
+  </defs>
+</svg>
