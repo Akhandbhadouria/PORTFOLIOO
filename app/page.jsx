@@ -31,9 +31,9 @@ export default function Home() {
   const [greetingIndex, setGreetingIndex] = useState(0)
 
   const greetings = [
-    "Hello", "Hola", "Bonjour", "Ciao", "こんにちは",
-    "안녕하세요", "مرحبا", "Olá", "Hallo", "नमस्कार",
-    "ਸਤ ਸ੍ਰੀ ਅਕਾਲ", "నమస్కారం", "ನಮಸ್ಕಾರ", "नमस्ते"
+    "Hello", "Hola", "Bonjour", "Ciao",
+    "안녕하세요", "مرحبا", "Hallo",
+    "ਸਤ ਸ੍ਰੀ ਅਕਾਲ", "ನಮಸ್ಕಾರ", "नमस्ते"
   ]
 
   const CRITICAL_IMAGES = ['/hero-bg.webp', '/1774288544676-1-tjs99i.webp']
@@ -77,10 +77,10 @@ export default function Home() {
   useEffect(() => {
     if (!loading) return
     if (greetingIndex < greetings.length - 1) {
-      const t = setTimeout(() => setGreetingIndex(prev => prev + 1), 110)
+      const t = setTimeout(() => setGreetingIndex(prev => prev + 1), 520)
       return () => clearTimeout(t)
     } else {
-      const t = setTimeout(() => setMinLoaderTimeDone(true), 120)
+      const t = setTimeout(() => setMinLoaderTimeDone(true), 650)
       return () => clearTimeout(t)
     }
   }, [greetingIndex, greetings.length])
@@ -155,7 +155,7 @@ export default function Home() {
                     initial={{ opacity: 0, y: 16, scale: 0.96, filter: 'blur(10px)' }}
                     animate={{ opacity: 1, y: 0, scale: 1, filter: 'blur(0px)' }}
                     exit={{ opacity: 0, y: -16, scale: 0.96, filter: 'blur(10px)' }}
-                    transition={{ duration: 0.24, ease: easeFluid }}
+                    transition={{ duration: 0.35, ease: easeFluid }}
                     style={{
                       fontSize: 'clamp(36px, 5.5vw, 68px)',
                       fontWeight: 600,
