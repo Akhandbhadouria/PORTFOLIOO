@@ -17,6 +17,7 @@ import Footer from '../components/Footer'
 // import Footer from '../components/FooterGrid'    // grid + crosshair version (kept for fallback)
 import CornerPlus from '../components/ui/corner-plus'
 
+
 export default function Home() {
   // The curtain is in the prerendered HTML but hidden by CSS by default. An
   // inline script in app/layout.jsx decides show/skip BEFORE first paint and
@@ -77,10 +78,10 @@ export default function Home() {
   useEffect(() => {
     if (!loading) return
     if (greetingIndex < greetings.length - 1) {
-      const t = setTimeout(() => setGreetingIndex(prev => prev + 1), 520)
+      const t = setTimeout(() => setGreetingIndex(prev => prev + 1), 320)
       return () => clearTimeout(t)
     } else {
-      const t = setTimeout(() => setMinLoaderTimeDone(true), 650)
+      const t = setTimeout(() => setMinLoaderTimeDone(true), 400)
       return () => clearTimeout(t)
     }
   }, [greetingIndex, greetings.length])

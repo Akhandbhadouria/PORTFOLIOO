@@ -48,7 +48,7 @@ export default function Footer() {
     const GITHUB = 'https://github.com/Akhandbhadouria'
     const LINKEDIN = 'https://www.linkedin.com/in/akhand320/'
     const LEETCODE = 'https://leetcode.com/u/akhand_07/'
-    const RESUME = 'https://drive.google.com/file/d/1JweM7qBCADSj7XxRncEqMow7wmQ5fZK5/view?usp=sharing'
+    const RESUME = 'https://drive.google.com/file/d/123ivkXyXzQ-sWK2fufpRtZfNEXsP6koI/view?usp=sharing'
 
     // shared styles — tuned to the site's liquid-glass theme and readable on
     // both light and dark DevTools

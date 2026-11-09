@@ -4,6 +4,7 @@ import { motion } from 'framer-motion'
 import { useEffect, useRef } from 'react'
 import Magnetic from './Magnetic'
 
+
 const capabilities = [
   { n: '01', title: 'Machine Learning', desc: 'Building end-to-end ML pipelines — from data preprocessing to model deployment.' },
   { n: '02', title: 'Data Science', desc: 'Turning raw datasets into actionable insights with Python, Pandas, and Matplotlib.' },
@@ -259,7 +260,6 @@ export default function Hero() {
               transition={{ duration: 0.9, delay: 0.35, ease: easeFluid }}
               className="hero-lines"
             >
-              <span className="hero-line hero-line--grad">I&apos;m Akhand.</span>
               <span className="hero-line hero-line--bold">Data Science</span>
               <span className="hero-line hero-line--italic">&amp; AI Engineer</span>
             </motion.h1>

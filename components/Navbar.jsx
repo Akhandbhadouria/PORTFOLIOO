@@ -6,8 +6,8 @@ import { usePathname } from 'next/navigation'
 import ThemeSwitch from './ThemeSwitch'
 
 const resumes = [
-  { label: 'General CV',    url: 'https://drive.google.com/file/d/1Qmg2B83VRTR0sgsx5XcWDxT3LiT0kLrg/view?usp=sharing', sub: 'Full overview' },
-  { label: 'Specialized CV', url: 'https://drive.google.com/file/d/1JweM7qBCADSj7XxRncEqMow7wmQ5fZK5/view?usp=sharing', sub: 'AI/ML & Data Science' },
+  { label: 'General CV',    url: 'https://drive.google.com/file/d/123ivkXyXzQ-sWK2fufpRtZfNEXsP6koI/view?usp=sharing', sub: 'Full overview' },
+  { label: 'Specialized CV', url: 'https://drive.google.com/file/d/123ivkXyXzQ-sWK2fufpRtZfNEXsP6koI/view?usp=sharing', sub: 'AI/ML & Data Science' },
 ]
 
 const navLinks = [
@@ -275,7 +275,7 @@ export default function Navbar() {
               >
               {resumes.map((r, i) => (
                 <a
-                  key={r.url}
+                  key={r.label}
                   href={r.url}
                   target="_blank"
                   rel="noopener noreferrer"
@@ -452,7 +452,7 @@ export default function Navbar() {
           </span>
           {resumes.map((r) => (
             <a
-              key={r.url}
+              key={r.label}
               href={r.url}
               target="_blank"
               rel="noopener noreferrer"

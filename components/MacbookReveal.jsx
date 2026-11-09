@@ -191,10 +191,8 @@ export default function MacbookReveal() {
                         <div style={{ display: 'flex', gap: '16px' }}>{['Home', 'Projects', 'Stack', 'Experience'].map(l => <span key={l} style={{ color: 'rgba(var(--paper), 0.6)', fontSize: '8px' }}>{l}</span>)}</div>
                       </div>
                       
-                      <div style={{ position: 'absolute', bottom: '34px', left: '30px' }}>
-                        <span style={{ color: 'rgba(var(--paper), 0.7)', fontSize: '11px', fontWeight: 500, letterSpacing: '0.05em' }}>नमस्ते</span>
-                        <p style={{ color: '#fff', fontWeight: 700, fontSize: '30px', lineHeight: 1.05, marginTop: '4px', letterSpacing: '-0.03em' }}>I'm Akhand</p>
-                        <p style={{ color: '#ff7a18', fontWeight: 700, fontSize: '30px', lineHeight: 1.05, letterSpacing: '-0.03em' }}>Yadav.</p>
+                      <div style={{ position: 'absolute', bottom: '28px', left: '30px', right: '30px' }}>
+                        <p style={{ color: '#ff7a18', fontWeight: 700, fontSize: '22px', lineHeight: 1.05, letterSpacing: '-0.03em' }}>Data Science & AI</p>
                       </div>
                     </div>
                   </motion.div>
